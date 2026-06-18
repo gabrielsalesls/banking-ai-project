@@ -9,6 +9,13 @@ agente (humano ou automatizado) que atue no projeto.
 - Monorepo com múltiplas APIs (a primeira API existente é `bankcore`).
 - Novas APIs devem ser adicionadas como diretórios irmãos na raiz do repositório.
 
+## Arquitetura
+
+- Arquitetura em 3 camadas: Controller, Service, Repository.
+- Controller: expõe os endpoints e delega a lógica para a camada de Service.
+- Service: contém a lógica de negócio e orquestra chamadas ao Repository.
+- Repository: acesso a dados (JPA, JDBC, etc.).
+
 ## Regras de Desenvolvimento
 
 Ao implementar uma tarefa:
@@ -19,7 +26,7 @@ Ao implementar uma tarefa:
 - Não altere arquivos fora do escopo da tarefa.
 - Prefira soluções simples.
 - Explique sempre quais arquivos foram modificados.
-- Para cada alteração e arquivo criado na API, gere testes unitários validando as mudanças.
+- Para cada implementação nova na API, escreva testes unitários cobrindo cenários sobre as alterações e adições feitas.
 - Commits só podem ser feitos se nenhum teste unitário estiver quebrado.
 - Commits só podem ser feitos quando explicitamente solicitado pelo usuário.
 
