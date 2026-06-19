@@ -3,7 +3,9 @@ package dev.gabrielsales.bankcore.service;
 import dev.gabrielsales.bankcore.domain.entity.User;
 import dev.gabrielsales.bankcore.exception.EmailAlreadyExistsException;
 import dev.gabrielsales.bankcore.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserService {
 
     private final UserRepository userRepository;
