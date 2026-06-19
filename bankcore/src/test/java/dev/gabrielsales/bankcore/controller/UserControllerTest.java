@@ -2,8 +2,10 @@ package dev.gabrielsales.bankcore.controller;
 
 import dev.gabrielsales.bankcore.domain.entity.User;
 import dev.gabrielsales.bankcore.dto.CreateUserRequest;
+import dev.gabrielsales.bankcore.dto.UserResponse;
 import dev.gabrielsales.bankcore.exception.EmailAlreadyExistsException;
 import dev.gabrielsales.bankcore.exception.GlobalExceptionHandler;
+import dev.gabrielsales.bankcore.exception.UserNotFoundException;
 import dev.gabrielsales.bankcore.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -70,5 +73,28 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.error").value("Email already exists: jane@example.com"));
+    }
+
+    @Test
+    void shouldReturn200WhenUserFoundByEmail() throws Exception {
+        User user = new User("Jane Doe", "jane@example.com", "secret456");
+        UserResponse response = UserResponse.from(user);
+        when(userService.getUserByEmail("jane@example.com")).thenReturn(response);
+
+        mockMvc.perform(get("/users/email/{email}", "jane@example.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Jane Doe"))
+                .andExpect(jsonPath("$.email").value("jane@example.com"))
+                .andExpect(jsonPath("$.password").doesNotExist());
+    }
+
+    @Test
+    void shouldReturn404WhenEmailNotFound() throws Exception {
+        when(userService.getUserByEmail("missing@example.com"))
+                .thenThrow(new UserNotFoundException("missing@example.com"));
+
+        mockMvc.perform(get("/users/email/{email}", "missing@example.com"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("User not found: missing@example.com"));
     }
 }

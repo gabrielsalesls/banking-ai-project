@@ -1,8 +1,11 @@
 package dev.gabrielsales.bankcore.service;
 
 import dev.gabrielsales.bankcore.domain.entity.User;
+import dev.gabrielsales.bankcore.dto.UserResponse;
 import dev.gabrielsales.bankcore.exception.EmailAlreadyExistsException;
+import dev.gabrielsales.bankcore.exception.UserNotFoundException;
 import dev.gabrielsales.bankcore.repository.UserRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,5 +70,27 @@ class UserServiceTest {
         User result = userService.createUser("John Doe", "john@example.com", "secret123");
 
         assertThat(result).isSameAs(savedUser);
+    }
+
+    @Test
+    void shouldReturnUserResponseWhenEmailFound() {
+        when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(savedUser));
+
+        UserResponse result = userService.getUserByEmail("john@example.com");
+
+        assertThat(result.name()).isEqualTo("John Doe");
+        assertThat(result.email()).isEqualTo("john@example.com");
+        verify(userRepository).findByEmail("john@example.com");
+    }
+
+    @Test
+    void shouldThrowUserNotFoundExceptionWhenEmailNotFound() {
+        when(userRepository.findByEmail("unknown@example.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.getUserByEmail("unknown@example.com"))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessageContaining("unknown@example.com");
+
+        verify(userRepository).findByEmail("unknown@example.com");
     }
 }
