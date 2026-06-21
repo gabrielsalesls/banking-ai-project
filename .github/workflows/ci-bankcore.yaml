@@ -1,0 +1,28 @@
+name: CI - bankcore
+
+on:
+  push:
+    branches: [develop, main]
+    paths: ['bankcore/**']
+  pull_request:
+    branches: [develop, main]
+    paths: ['bankcore/**']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./bankcore
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: Build & Test
+        run: ./mvnw verify --batch-mode
