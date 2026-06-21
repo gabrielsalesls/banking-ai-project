@@ -24,5 +24,8 @@ jobs:
           java-version: 21
           distribution: temurin
 
+      - name: Make mvnw executable
+        run: chmod +x mvnw
+
       - name: Build & Test
         run: ./mvnw verify --batch-mode
