@@ -1,0 +1,27 @@
+meta {
+  name: Update User
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}/users/{{user_id}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "John Updated",
+    "email": "john.updated@example.com"
+  }
+}
+
+vars:pre-request {
+  base_url: http://localhost:8080
+  user_id: f09a2e02-0993-42bb-9336-5c6896d24d5d
+}
